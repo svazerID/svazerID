@@ -1,41 +1,43 @@
-name: CI
+name: CI Log Auto Update
 
 on:
   schedule:
-    - cron: '*/20 * * * *'
+    - cron: '*/20 * * * *'  # setiap 20 menit
   workflow_dispatch:
 
 jobs:
-  build:
+  update-log:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Create initial log if not exists
+      - name: Checkout Repository
+        uses: actions/checkout@v3  # Tanpa override token!
+
+      - name: Buat log.md jika belum ada
         run: |
           if [ ! -f log.md ]; then
             echo "Initial log" > log.md
             git add log.md
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git commit -m "Hello World"
+            git commit -m "Buat file log.md pertama"
             git push origin main
           fi
 
-      - name: Update log with date
+      - name: Tambahkan waktu ke log.md
         run: |
           echo "$(date)" >> log.md
           git add log.md
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Jangan Lupa Follow @svazerID" || echo "No changes to commit"
-          git push origin main || echo "Nothing to push"
+          git commit -m "Menambahkan waktu ke log"
+          git push origin main || echo "Tidak ada perubahan untuk dipush"
 
-      - name: Clean last line
+      - name: Hapus baris terakhir log.md
         run: |
           sed -i '$ d' log.md
           git add log.md
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Jangan Lupa Follow @svazerID" || echo "No changes to commit"
-          git push origin main || echo "Nothing to push"
+          git commit -m "Menghapus baris terakhir log"
+          git push origin main || echo "Tidak ada perubahan untuk dipush"
