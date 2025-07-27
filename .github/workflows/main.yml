@@ -2,24 +2,22 @@ name: CI
 
 on:
   schedule:
-    - cron: '*/20 * * * *'  # Hanya jalankan setiap 1 jam
-  workflow_dispatch:        # Bisa dijalankan manual jika perlu
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
-          
+      
       - name: Create initial log if not exists
         run: |
           if [ ! -f log.md ]; then
             echo "Initial log" > log.md
             git add log.md
-            git config user.name ${{ secrets.USERNAME }}
-            git config user.email ${{ secrets.EMAIL }}
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
             git commit -m "Hello World"
             git push origin main
           fi
@@ -28,8 +26,8 @@ jobs:
         run: |
           echo "$(date)" >> log.md
           git add log.md
-          git config user.name ${{ secrets.USERNAME }}
-          git config user.email ${{ secrets.EMAIL }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Jangan Lupa Follow @svazerID" || echo "No changes to commit"
           git push origin main || echo "Nothing to push"
 
@@ -37,7 +35,7 @@ jobs:
         run: |
           sed -i '$ d' log.md
           git add log.md
-          git config user.name ${{ secrets.USERNAME }}
-          git config user.email ${{ secrets.EMAIL }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Jangan Lupa Follow @svazerID" || echo "No changes to commit"
           git push origin main || echo "Nothing to push"
