@@ -1,43 +1,26 @@
 name: CI Log Auto Update
 
 on:
-  schedule:
-    - cron: '*/20 * * * *'  # setiap 20 menit
   workflow_dispatch:
 
 jobs:
   update-log:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3  # Tanpa override token!
+      - name: Checkout with PAT
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+          persist-credentials: false
 
-      - name: Buat log.md jika belum ada
+      - name: Setup Git user
         run: |
-          if [ ! -f log.md ]; then
-            echo "Initial log" > log.md
-            git add log.md
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git commit -m "Buat file log.md pertama"
-            git push origin main
-          fi
+          git config user.name "svazerID"
+          git config user.email "svazerID@users.noreply.github.com"
 
-      - name: Tambahkan waktu ke log.md
+      - name: Add date to log.md
         run: |
           echo "$(date)" >> log.md
           git add log.md
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Menambahkan waktu ke log"
-          git push origin main || echo "Tidak ada perubahan untuk dipush"
-
-      - name: Hapus baris terakhir log.md
-        run: |
-          sed -i '$ d' log.md
-          git add log.md
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Menghapus baris terakhir log"
-          git push origin main || echo "Tidak ada perubahan untuk dipush"
+          git commit -m "Update log"
+          git push origin main
