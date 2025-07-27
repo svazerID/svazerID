@@ -1,34 +1,43 @@
-name: Auto Push dengan GitHub Token
+name: CI
 
 on:
-  workflow_dispatch:  # bisa kamu jalankan manual
   schedule:
-    - cron: '0 * * * *'  # auto jalan tiap jam
+    - cron: '*/20 * * * *'  # Hanya jalankan setiap 1 jam
+  workflow_dispatch:        # Bisa dijalankan manual jika perlu
 
 jobs:
-  autopush:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-      with:
-        persist-credentials: false  # penting agar pakai token custom
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          
+      - name: Create initial log if not exists
+        run: |
+          if [ ! -f log.md ]; then
+            echo "Initial log" > log.md
+            git add log.md
+            git config user.name ${{ secrets.USERNAME }}
+            git config user.email ${{ secrets.EMAIL }}
+            git commit -m "Hello World"
+            git push origin main
+          fi
 
-    - name: Konfigurasi Git
-      run: |
-        git config user.name "alfi-bot"
-        git config user.email "alfi@users.noreply.github.com"
+      - name: Update log with date
+        run: |
+          echo "$(date)" >> log.md
+          git add log.md
+          git config user.name ${{ secrets.USERNAME }}
+          git config user.email ${{ secrets.EMAIL }}
+          git commit -m "Jangan Lupa Follow @svazerID" || echo "No changes to commit"
+          git push origin main || echo "Nothing to push"
 
-    - name: Tambahkan Log
-      run: |
-        echo "$(date)" >> log.md
-
-    - name: Commit dan Push
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        git add log.md
-        git commit -m "log: $(date)" || echo "ga ada perubahan"
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
-        git push origin HEAD:main
+      - name: Clean last line
+        run: |
+          sed -i '$ d' log.md
+          git add log.md
+          git config user.name ${{ secrets.USERNAME }}
+          git config user.email ${{ secrets.EMAIL }}
+          git commit -m "Jangan Lupa Follow @svazerID" || echo "No changes to commit"
+          git push origin main || echo "Nothing to push"
